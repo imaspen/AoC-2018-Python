@@ -34,4 +34,35 @@ def part_one(rules):
 
 
 def part_two(rules):
-    pass
+    rules = get_rules(rules)
+    total_rules = len(rules)
+    completed = set()
+    num_workers = 5
+    workers = set()
+    seconds = -1
+
+    while len(completed) < total_rules:
+        remaining = set()
+        for worker in workers:
+            worker.time -= 1
+            if worker.time == 0:
+                completed.add(worker.job)
+            else:
+                remaining.add(worker)
+        workers = remaining
+        ready = sorted(get_ready(rules, completed))
+        while len(workers) < num_workers and len(ready) > 0:
+            next_job = ready.pop(0)
+            workers.add(Worker(next_job))
+            rules.pop(next_job)
+        seconds += 1
+    return seconds
+
+
+class Worker:
+    def __init__(self, job):
+        self.job = job
+        self.time = ord(job) - 4
+
+    def __str__(self):
+        return "Worker(job={}, time={})".format(self.job, self.time)
