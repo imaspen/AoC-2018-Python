@@ -11,3 +11,7 @@ def file_path_to_string_list(path):
 
 def file_path_to_int_list(path):
     return [int(line) for line in file_path_to_string_list(path)]
+
+
+def spaced_file_path_to_int_list(path):
+    return [int(i) for i in file_path_to_string(path).split(' ')]
