@@ -2,6 +2,7 @@ from collections import defaultdict
 from itertools import chain
 
 __author__ = "Aspen Thompson"
+__date__ = "2018-12-03"
 
 
 def part_one(claims):

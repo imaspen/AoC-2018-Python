@@ -1,4 +1,5 @@
 __author__ = "Aspen Thompson"
+__date__ = "2018-12-05"
 
 
 def part_one(polymer):

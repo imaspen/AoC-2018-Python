@@ -1,6 +1,7 @@
 import itertools
 
 __author__ = "Aspen Thompson"
+__date__ = "2018-12-01"
 
 
 def part_one(frequencies):

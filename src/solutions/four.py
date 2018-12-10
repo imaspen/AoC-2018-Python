@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 __author__ = "Aspen Thompson"
+__date__ = "2018-12-04"
 
 
 def generate_guards(lines):
