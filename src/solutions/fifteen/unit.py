@@ -31,24 +31,21 @@ class Unit(Node):
         return type(cell) == Unit and cell.mode != self.mode
 
     def take_turn(self):
-        if len(self.enemy_neighbors) > 0:
-            self.attack()
+        targets = [cell for cell in itertools.chain(*self.grid) if self.is_cell_enemy(cell)]
+        if len(targets) == 0:
+            return False
         else:
-            targets = [cell for cell in itertools.chain(*self.grid) if self.is_cell_enemy(cell)]
-            if len(targets) == 0:
-                return False
-            else:
-                paths = []
+            paths = []
+            if not self.attack():
                 for target in targets:
                     move_targets = [self.get_path(node) for node in target.neighbors if node.mode == FLOOR]
                     routes = [path for path in move_targets if path is not None]
                     if len(routes) > 0:
-                        paths.append((target, min(routes, key=lambda route: (len(route), route[0].y, route[0].x)),))
+                        paths.append(min(routes, key=lambda route: (len(route), route[-1].y, route[-1].x)))
                 if len(paths) > 0:
-                    path = min(paths, key=lambda path: (len(path[1]), path[0].y, path[0].x))[1]
+                    path = min(paths, key=lambda path: (len(path), path[-1].y, path[-1].x))
                     self.move(path[-1])
-                if len(self.enemy_neighbors) > 0:
-                    self.attack()
+                self.attack()
         return True
 
     def move(self, target):
@@ -62,7 +59,10 @@ class Unit(Node):
         target.y = ty
 
     def attack(self):
-        min(self.enemy_neighbors, key=lambda unit: (unit.hp, unit.y, unit.x)).hp -= self.ap
+        if len(self.enemy_neighbors) > 0:
+            min(self.enemy_neighbors, key=lambda unit: (unit.hp, unit.y, unit.x)).hp -= self.ap
+            return True
+        return False
 
     def get_path_a(self, target):
         open_list = {self}

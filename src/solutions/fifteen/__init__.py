@@ -49,16 +49,18 @@ def part_one(lines):
                 if type(cell) == Unit:
                     move_order.append(cell)
         for unit in move_order:
-            if not unit.take_turn():
-                total_hp = 0
-                for row in grid:
-                    for cell in row:
-                        if type(cell) == Unit:
-                            total_hp += cell.hp
-                print(i)
-                print_grid(grid)
-                print(total_hp)
-                return i * total_hp
+            print(unit)
+            if unit.hp > 0:
+                if not unit.take_turn():
+                    total_hp = 0
+                    for row in grid:
+                        for cell in row:
+                            if type(cell) == Unit:
+                                total_hp += cell.hp
+                    print(i)
+                    print_grid(grid)
+                    print(total_hp)
+                    return i * total_hp
         i += 1
         print(i)
         print_grid(grid)
