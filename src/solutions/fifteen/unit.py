@@ -20,8 +20,9 @@ class Unit(Node):
     def hp(self, value):
         if value <= 0:
             self.grid[self.y][self.x] = Node(self.x, self.y, self.grid, FLOOR)
-        else:
-            self._hp = value
+            if self.ap > 3:
+                raise ValueError
+        self._hp = value
 
     @property
     def enemy_neighbors(self):
@@ -41,9 +42,9 @@ class Unit(Node):
                     move_targets = [self.get_path(node) for node in target.neighbors if node.mode == FLOOR]
                     routes = [path for path in move_targets if path is not None]
                     if len(routes) > 0:
-                        paths.append(min(routes, key=lambda route: (len(route), route[-1].y, route[-1].x)))
+                        paths.append(min(routes, key=lambda route: (len(route), route[0].y, route[0].x)))
                 if len(paths) > 0:
-                    path = min(paths, key=lambda path: (len(path), path[-1].y, path[-1].x))
+                    path = min(paths, key=lambda path: (len(path), path[0].y, path[0].x))
                     self.move(path[-1])
                 self.attack()
         return True
@@ -63,34 +64,6 @@ class Unit(Node):
             min(self.enemy_neighbors, key=lambda unit: (unit.hp, unit.y, unit.x)).hp -= self.ap
             return True
         return False
-
-    def get_path_a(self, target):
-        open_list = {self}
-        closed_list = set()
-        while target not in closed_list:
-            if len(open_list) == 0:
-                return None
-            current = min(open_list, key=lambda node: node.f)
-            open_list.remove(current)
-            closed_list.add(current)
-            if target in closed_list:
-                break
-            for i, neighbor in enumerate(current.neighbors):
-                if (type(neighbor) == Node and neighbor.mode == FLOOR
-                        and neighbor not in closed_list or neighbor == target):
-                    if neighbor not in open_list:
-                        neighbor.parent = current
-                        neighbor.g = current.g + 1
-                        neighbor.h = (abs(neighbor.x - target.x) + abs(neighbor.y - target.y))
-                        open_list.add(neighbor)
-                    elif current.g + 1 < neighbor.g:
-                        neighbor.g = current.g + 1
-                        neighbor.parent = current
-
-        path = [target]
-        while path[-1].parent.parent is not None:
-            path.append(path[-1].parent)
-        return path
 
     def get_path(self, target):
         q = set([cell for cell in itertools.chain(*self.grid) if cell.mode == FLOOR])
