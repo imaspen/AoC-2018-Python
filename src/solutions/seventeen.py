@@ -53,7 +53,11 @@ def part_one(lines):
 
 
 def part_two(lines):
-    pass
+    veins = [Vein.from_string(line) for line in lines]
+    grid = get_propagated_grid(get_grid(veins), min([vein.min_y() for vein in veins]))
+    score = sum(itertools.chain(*[[1 for cell in row.values() if cell == 2] for row in grid.values()]))
+    print_grid(grid)
+    return score
 
 
 class Drop:
