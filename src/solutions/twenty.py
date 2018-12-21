@@ -76,7 +76,14 @@ def part_one(line):
 
 
 def part_two(line):
-    pass
+    grid = generate_grid(line)
+    return sum(
+        [
+            1 for i in itertools.chain(*[
+                r.values() for r in grid[0][0].get_paths().values()
+            ]) if i.d >= 1000
+        ]
+    )
 
 
 class Node:
