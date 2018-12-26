@@ -4,7 +4,7 @@ __author__ = "Aspen Thompson"
 __date__ = "2018-12-24"
 
 
-def get_units(lines):
+def get_units(lines, boost=0):
     a = set()
     b = set()
     current = 'a'
@@ -12,10 +12,11 @@ def get_units(lines):
         if line == "Infection:":
             current = 'b'
         elif line != "":
-            n = Unit.from_string(current[0], line)
             if current == 'a':
+                n = Unit.from_string(current[0], line, boost)
                 a.add(n)
             else:
+                n = Unit.from_string(current[0], line)
                 b.add(n)
     return a, b
 
@@ -40,7 +41,6 @@ def set_targets(a, b):
 def do_attacks(a, b):
     for unit in sorted(a.union(b), key=lambda u: u.initiative, reverse=True):
         if unit.count > 0:
-            print(unit)
             unit.attack()
 
 
@@ -54,12 +54,18 @@ def part_one(lines):
         set_targets(a, b)
         set_targets(b, a)
         do_attacks(a, b)
-        print()
     return max(get_alive(a), get_alive(b))
 
 
 def part_two(lines):
-    pass
+    a, b = get_units(lines, 79)
+    while get_alive(a) > 0 and get_alive(b) > 0:
+        set_targets(a, b)
+        set_targets(b, a)
+        do_attacks(a, b)
+    if get_alive(b) > 0:
+        return False
+    return get_alive(a)
 
 
 class Unit:
@@ -89,7 +95,7 @@ class Unit:
             self.target.count -= self.target.get_damage(self) // self.target.hp
 
     @staticmethod
-    def from_string(team, string):
+    def from_string(team, string, boost=0):
         u = Unit()
         u.team = team
         r = re.compile(
@@ -101,14 +107,13 @@ class Unit:
         )
         p = r.search(string)
         p = p.groupdict()
-        print(p)
         u.count = int(p['count'])
         u.hp = int(p['hp'])
         u.immunities = p['immunities'].split(", ")\
             if p['immunities'] is not None else []
         u.weaknesses = p['weaknesses'].split(", ")\
             if p['weaknesses'] is not None else []
-        u.ap = int(p['ap'])
+        u.ap = int(p['ap']) + boost
         u.damage_type = p['type']
         u.initiative = int(p['initiative'])
         return u
